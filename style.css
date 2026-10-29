@@ -1,0 +1,2043 @@
+/* ==========================================================================
+   AEROGRAPH — FLIGHT ROUTE PLANNER & GRAPH ENGINE
+   Aviation Operations Dashboard & Algorithm Visualizer Stylesheet
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. CSS Custom Properties / Design Tokens
+   -------------------------------------------------------------------------- */
+:root {
+  /* Dark Mode (Default) Palette */
+  --bg-app: #080d1a;
+  --bg-sidebar: #0d1527;
+  --bg-header: #0e172a;
+  --bg-card: #131f37;
+  --bg-card-hover: #172642;
+  --bg-card-subtle: #0f182c;
+  --bg-input: #0a1122;
+  --bg-tooltip: #0c162c;
+  --bg-modal-backdrop: rgba(4, 7, 15, 0.82);
+
+  --border-color: #1e2e4f;
+  --border-light: #2a3e68;
+  --border-focus: #38bdf8;
+
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --text-subtle: #64748b;
+  --text-heading: #ffffff;
+
+  /* Aviation Color Accents */
+  --accent-primary: #0284c7;
+  --accent-primary-hover: #0369a1;
+  --accent-cyan: #06b6d4;
+  --accent-sky: #38bdf8;
+  --accent-emerald: #10b981;
+  --accent-emerald-subtle: rgba(16, 185, 129, 0.15);
+  --accent-crimson: #ef4444;
+  --accent-crimson-subtle: rgba(239, 68, 68, 0.15);
+  --accent-amber: #f59e0b;
+  --accent-amber-subtle: rgba(245, 158, 11, 0.15);
+  --accent-purple: #8b5cf6;
+
+  /* SVG Map & Graph Colors */
+  --map-bg: #070e1c;
+  --map-grid: rgba(56, 189, 248, 0.05);
+  --map-land: #111a30;
+  --map-land-border: #233559;
+  --edge-default: rgba(148, 163, 184, 0.22);
+  --edge-active: #38bdf8;
+  --edge-mst: #10b981;
+  --node-bg: #0f1c36;
+  --node-border: #38bdf8;
+  --node-text: #f8fafc;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px rgba(56, 189, 248, 0.25);
+
+  /* Geometry & Transitions */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+  --transition-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --sidebar-width: 270px;
+  --header-height: 70px;
+}
+
+/* Light Theme Overrides */
+html[data-theme="light"] {
+  --bg-app: #f1f5f9;
+  --bg-sidebar: #0f172a;
+  --bg-header: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8fafc;
+  --bg-card-subtle: #f8fafc;
+  --bg-input: #f1f5f9;
+  --bg-tooltip: #1e293b;
+  --bg-modal-backdrop: rgba(15, 23, 42, 0.65);
+
+  --border-color: #e2e8f0;
+  --border-light: #cbd5e1;
+  --border-focus: #0284c7;
+
+  --text-main: #334155;
+  --text-muted: #64748b;
+  --text-subtle: #94a3b8;
+  --text-heading: #0f172a;
+
+  --map-bg: #e2e8f0;
+  --map-grid: rgba(2, 132, 199, 0.08);
+  --map-land: #cbd5e1;
+  --map-land-border: #94a3b8;
+  --edge-default: rgba(100, 116, 139, 0.3);
+  --edge-active: #0284c7;
+  --edge-mst: #059669;
+  --node-bg: #ffffff;
+  --node-border: #0284c7;
+  --node-text: #0f172a;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 0 15px rgba(2, 132, 199, 0.2);
+}
+
+/* --------------------------------------------------------------------------
+   2. Base & Reset
+   -------------------------------------------------------------------------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  line-height: 1.5;
+  font-size: 14px;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-heading);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+a {
+  color: var(--accent-sky);
+  text-decoration: none;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.text-accent {
+  color: var(--accent-sky);
+}
+
+.mt-4 { margin-top: 1rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.flex-1 { flex: 1; }
+
+/* --------------------------------------------------------------------------
+   3. App Layout (Sidebar + Main View)
+   -------------------------------------------------------------------------- */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100vw;
+}
+
+/* Sidebar */
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+  transition: transform var(--transition-slow);
+}
+
+.brand {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.brand-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-cyan));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 0 15px rgba(2, 132, 199, 0.4);
+}
+
+.brand-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.brand-text h2 {
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  background: linear-gradient(to right, #fff, #94a3b8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.badge-sub {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent-sky);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sidebar-toggle {
+  display: none;
+  margin-left: auto;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+}
+
+.nav-menu {
+  padding: 1.25rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.nav-section-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-subtle);
+  padding: 0.75rem 0.75rem 0.35rem;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  text-align: left;
+  width: 100%;
+}
+
+.nav-item svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+}
+
+.nav-item:hover svg {
+  transform: translateX(2px);
+}
+
+.nav-item.active {
+  background: linear-gradient(90deg, rgba(2, 132, 199, 0.22), rgba(6, 182, 212, 0.08));
+  color: var(--accent-sky);
+  font-weight: 600;
+  border-left: 3px solid var(--accent-sky);
+}
+
+.sidebar-status-card {
+  margin: 1rem;
+  padding: 1rem;
+  background: rgba(14, 23, 42, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.status-indicator-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-emerald);
+  box-shadow: 0 0 8px var(--accent-emerald);
+}
+
+.status-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.status-info {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.network-quick-metric {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 0.5rem;
+}
+
+.network-quick-metric small {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--text-subtle);
+}
+
+.network-quick-metric strong {
+  font-size: 0.78rem;
+}
+
+/* --------------------------------------------------------------------------
+   4. Header & Top Bar
+   -------------------------------------------------------------------------- */
+.main-wrapper {
+  margin-left: var(--sidebar-width);
+  width: calc(100vw - var(--sidebar-width));
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.top-header {
+  height: var(--header-height);
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.75rem;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  backdrop-filter: blur(8px);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.menu-btn {
+  display: none;
+  padding: 0.4rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+}
+
+.menu-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.header-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.header-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Search Box */
+.search-box {
+  position: relative;
+  width: 280px;
+}
+
+.search-box svg {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--text-subtle);
+  pointer-events: none;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 0.55rem 0.85rem 0.55rem 2.4rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  outline: none;
+  font-size: 0.85rem;
+  transition: all var(--transition-fast);
+}
+
+.search-box input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+}
+
+.search-results-dropdown {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  max-height: 280px;
+  overflow-y: auto;
+  z-index: 150;
+  display: none;
+}
+
+.search-results-dropdown.active {
+  display: block;
+}
+
+.search-item {
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background var(--transition-fast);
+}
+
+.search-item:hover {
+  background: var(--bg-card-hover);
+}
+
+.search-item-info strong {
+  color: var(--accent-sky);
+  font-family: 'JetBrains Mono', monospace;
+  margin-right: 0.4rem;
+}
+
+.search-item-info span {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.search-item-badge {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+}
+
+/* Network Status Badge */
+.network-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: var(--accent-emerald-subtle);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-emerald);
+}
+
+.badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-emerald);
+}
+
+.badge-dot.pulse {
+  animation: pulse-ring 2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.icon-button {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+}
+
+.icon-button:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-heading);
+}
+
+.icon-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Theme toggle sun/moon visibility */
+html[data-theme="dark"] .sun-icon { display: block; }
+html[data-theme="dark"] .moon-icon { display: none; }
+html[data-theme="light"] .sun-icon { display: none; }
+html[data-theme="light"] .moon-icon { display: block; }
+
+/* --------------------------------------------------------------------------
+   5. Buttons & Form Controls
+   -------------------------------------------------------------------------- */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.button-sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.78rem;
+}
+
+.button-lg {
+  padding: 0.75rem 1.25rem;
+  font-size: 0.95rem;
+}
+
+.button-primary {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-cyan));
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(2, 132, 199, 0.35);
+}
+
+.button-primary:hover {
+  background: linear-gradient(135deg, #0369a1, #0891b2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.45);
+}
+
+.button-secondary {
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+}
+
+.button-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.button-outline {
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+}
+
+.button-outline:hover {
+  border-color: var(--border-light);
+  color: #fff;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.form-group label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.dot-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-green { background: var(--accent-emerald); box-shadow: 0 0 6px var(--accent-emerald); }
+.dot-red { background: var(--accent-crimson); box-shadow: 0 0 6px var(--accent-crimson); }
+.dot-amber { background: var(--accent-amber); box-shadow: 0 0 6px var(--accent-amber); }
+
+.form-control {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  outline: none;
+  font-size: 0.88rem;
+  transition: all var(--transition-fast);
+}
+
+.form-control:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+}
+
+.form-control-sm {
+  padding: 0.4rem 0.7rem;
+  font-size: 0.8rem;
+}
+
+select.form-control {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  padding-right: 2.2rem;
+  cursor: pointer;
+}
+
+select.form-control option {
+  background: var(--bg-card);
+  color: var(--text-main);
+}
+
+/* --------------------------------------------------------------------------
+   6. Main Content & Cards
+   -------------------------------------------------------------------------- */
+.main-content {
+  flex: 1;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: border-color var(--transition-fast);
+}
+
+.card:hover {
+  border-color: var(--border-light);
+}
+
+.card-header {
+  padding: 1.15rem 1.4rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-heading);
+}
+
+.card-title svg {
+  width: 18px;
+  height: 18px;
+  color: var(--accent-sky);
+}
+
+.card-body {
+  padding: 1.4rem;
+}
+
+.badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+}
+
+.badge-accent {
+  background: rgba(2, 132, 199, 0.15);
+  color: var(--accent-sky);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.badge-success {
+  background: var(--accent-emerald-subtle);
+  color: var(--accent-emerald);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-warning {
+  background: var(--accent-amber-subtle);
+  color: var(--accent-amber);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* --------------------------------------------------------------------------
+   7. Summary Stats Grid
+   -------------------------------------------------------------------------- */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-light);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.icon-blue { background: rgba(2, 132, 199, 0.15); color: var(--accent-sky); }
+.icon-cyan { background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); }
+.icon-emerald { background: var(--accent-emerald-subtle); color: var(--accent-emerald); }
+.icon-purple { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.stat-value {
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0.15rem 0;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.stat-sub {
+  font-size: 0.72rem;
+  color: var(--text-subtle);
+}
+
+/* --------------------------------------------------------------------------
+   8. Route Planner Workspace (Dashboard View)
+   -------------------------------------------------------------------------- */
+.tab-pane {
+  display: none;
+}
+
+.tab-pane.active {
+  display: block;
+}
+
+.planner-layout {
+  display: grid;
+  grid-template-columns: 460px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.flight-control-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.route-form {
+  padding: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.airports-select-row {
+  align-items: flex-end;
+}
+
+.swap-airports-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-input);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+  margin-bottom: 2px;
+}
+
+.swap-airports-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--accent-sky);
+  border-color: var(--border-focus);
+  transform: rotate(180deg);
+}
+
+.swap-airports-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.quick-presets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0;
+}
+
+.presets-label {
+  font-size: 0.72rem;
+  color: var(--text-subtle);
+  font-weight: 600;
+}
+
+.preset-chip {
+  padding: 0.25rem 0.55rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+}
+
+.preset-chip:hover {
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--accent-sky);
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.form-actions .button-primary {
+  flex: 1;
+}
+
+/* --------------------------------------------------------------------------
+   9. Route Results Dossier
+   -------------------------------------------------------------------------- */
+.route-results-card .card-body {
+  padding: 1.4rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2.5rem 1rem;
+}
+
+.empty-icon {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.03);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-subtle);
+}
+
+.empty-icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+.empty-state h4 {
+  font-size: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.empty-state p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+/* Computed Route Details */
+.result-header-box {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.result-codes-display {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.code-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #fff;
+}
+
+.flight-arrow-path {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.flight-arrow-path svg {
+  width: 22px;
+  height: 22px;
+  color: var(--accent-sky);
+  transform: rotate(90deg);
+}
+
+.stops-badge {
+  font-size: 0.68rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.result-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.metric-pill {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.metric-pill small {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-bottom: 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.metric-pill strong {
+  font-size: 1.15rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: #fff;
+}
+
+.efficiency-card {
+  background: rgba(2, 132, 199, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.efficiency-info small {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--accent-sky);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.efficiency-info span {
+  font-size: 0.82rem;
+  color: var(--text-main);
+}
+
+.efficiency-bar-container {
+  width: 100px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.efficiency-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-sky), var(--accent-emerald));
+  border-radius: 999px;
+}
+
+/* Flight Itinerary Timeline */
+.itinerary-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  padding-left: 1.25rem;
+  margin-top: 1rem;
+}
+
+.itinerary-timeline::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  bottom: 24px;
+  left: 5px;
+  width: 2px;
+  background: var(--border-color);
+}
+
+.timeline-leg {
+  position: relative;
+  padding-bottom: 1.25rem;
+}
+
+.timeline-leg:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-node {
+  position: absolute;
+  left: -1.25rem;
+  top: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 2px solid var(--accent-sky);
+  z-index: 2;
+}
+
+.timeline-leg.origin .timeline-node {
+  border-color: var(--accent-emerald);
+  background: var(--accent-emerald);
+}
+
+.timeline-leg.destination .timeline-node {
+  border-color: var(--accent-crimson);
+  background: var(--accent-crimson);
+}
+
+.timeline-leg.transit .timeline-node {
+  border-color: var(--accent-amber);
+  background: var(--accent-amber);
+}
+
+.timeline-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.airport-name-tag {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #fff;
+}
+
+.airport-sub-tag {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.leg-flight-meta {
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.leg-flight-meta span {
+  display: block;
+}
+
+/* --------------------------------------------------------------------------
+   10. Interactive SVG Map Panel
+   -------------------------------------------------------------------------- */
+.map-card {
+  display: flex;
+  flex-direction: column;
+  height: 720px;
+}
+
+.map-card-header {
+  padding: 1rem 1.4rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.map-title-group h3 {
+  font-size: 1.05rem;
+}
+
+.map-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.map-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.view-switch-group {
+  display: flex;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 2px;
+}
+
+.view-btn {
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+}
+
+.view-btn.active {
+  background: var(--bg-card);
+  color: var(--accent-sky);
+  box-shadow: var(--shadow-sm);
+}
+
+.zoom-controls {
+  display: flex;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-card);
+}
+
+.zoom-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  border-right: 1px solid var(--border-color);
+  font-weight: 700;
+  font-size: 1rem;
+  transition: all var(--transition-fast);
+}
+
+.zoom-btn:last-child {
+  border-right: none;
+}
+
+.zoom-btn:hover {
+  background: var(--bg-card-hover);
+  color: #fff;
+}
+
+/* SVG Map Canvas */
+.svg-map-wrapper {
+  flex: 1;
+  position: relative;
+  background: var(--map-bg);
+  overflow: hidden;
+  cursor: grab;
+}
+
+.svg-map-wrapper:active {
+  cursor: grabbing;
+}
+
+#networkSvg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* SVG Layers & Styling */
+.svg-grid-line {
+  stroke: var(--map-grid);
+  stroke-width: 1;
+}
+
+.india-boundary {
+  fill: var(--map-land);
+  stroke: var(--map-land-border);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  transition: fill var(--transition-slow);
+}
+
+.radar-sweep-circle {
+  fill: none;
+  stroke: rgba(56, 189, 248, 0.08);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+/* Graph Edges */
+.edge-line {
+  stroke: var(--edge-default);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  transition: stroke var(--transition-fast), stroke-width var(--transition-fast);
+}
+
+.edge-line:hover {
+  stroke: rgba(56, 189, 248, 0.6);
+  stroke-width: 2.5;
+}
+
+.edge-active-route {
+  stroke: url(#routeGradient);
+  stroke-width: 4;
+  stroke-linecap: round;
+  filter: url(#glow);
+  stroke-dasharray: 8 4;
+  animation: dashMove 1.5s linear infinite;
+}
+
+.edge-mst-route {
+  stroke: url(#mstGradient);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  filter: url(#glow);
+}
+
+.edge-alternative-route {
+  stroke: var(--accent-amber);
+  stroke-width: 2.5;
+  stroke-dasharray: 6 3;
+  opacity: 0.85;
+}
+
+@keyframes dashMove {
+  from { stroke-dashoffset: 24; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Graph Nodes / Airports */
+.airport-node-group {
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+}
+
+.airport-node-circle {
+  fill: var(--node-bg);
+  stroke: var(--node-border);
+  stroke-width: 2.2;
+  transition: all var(--transition-fast);
+}
+
+.airport-node-pulse {
+  fill: none;
+  stroke: var(--node-border);
+  stroke-width: 2;
+  opacity: 0.8;
+  animation: node-pulse-anim 2.5s infinite;
+}
+
+@keyframes node-pulse-anim {
+  0% { r: 7; opacity: 0.9; }
+  100% { r: 20; opacity: 0; }
+}
+
+.airport-node-group:hover .airport-node-circle {
+  transform: scale(1.3);
+  stroke-width: 3;
+  filter: url(#glow);
+}
+
+.airport-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  fill: var(--node-text);
+  text-anchor: middle;
+  pointer-events: none;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+.airport-city-label {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 9.5px;
+  fill: var(--text-muted);
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+/* Origin / Dest Highlight Classes */
+.node-origin .airport-node-circle {
+  fill: var(--accent-emerald);
+  stroke: #ffffff;
+  stroke-width: 3;
+  filter: url(#glowStrong);
+}
+
+.node-dest .airport-node-circle {
+  fill: var(--accent-crimson);
+  stroke: #ffffff;
+  stroke-width: 3;
+  filter: url(#glowStrong);
+}
+
+.node-transit .airport-node-circle {
+  fill: var(--accent-amber);
+  stroke: #ffffff;
+  stroke-width: 2.5;
+}
+
+/* Animated Airplane Icon */
+.animated-airplane {
+  filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.8));
+  pointer-events: none;
+}
+
+/* Map Legend */
+.map-legend {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  background: rgba(14, 23, 42, 0.85);
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(8px);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  font-size: 0.72rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  pointer-events: none;
+}
+
+.legend-header {
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.65rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.origin-dot { background: var(--accent-emerald); box-shadow: 0 0 6px var(--accent-emerald); }
+.dest-dot { background: var(--accent-crimson); box-shadow: 0 0 6px var(--accent-crimson); }
+.transit-dot { background: var(--accent-amber); }
+
+.legend-line {
+  width: 16px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+.route-line { background: var(--accent-sky); box-shadow: 0 0 6px var(--accent-sky); }
+.corridor-line { background: rgba(148, 163, 184, 0.4); }
+.mst-line { background: var(--accent-emerald); }
+
+/* Tooltip */
+.airport-tooltip {
+  position: absolute;
+  display: none;
+  background: var(--bg-tooltip);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  box-shadow: var(--shadow-lg);
+  pointer-events: none;
+  z-index: 120;
+  max-width: 260px;
+  transform: translate(-50%, -115%);
+  transition: opacity var(--transition-fast);
+}
+
+.airport-tooltip.active {
+  display: block;
+}
+
+.tooltip-title {
+  font-weight: 700;
+  color: #fff;
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tooltip-city {
+  font-size: 0.75rem;
+  color: var(--accent-sky);
+  margin-bottom: 0.35rem;
+}
+
+.tooltip-body {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.map-footer-bar {
+  padding: 0.65rem 1.4rem;
+  background: var(--bg-card-subtle);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.map-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.map-hint svg {
+  width: 14px;
+  height: 14px;
+  color: var(--accent-sky);
+}
+
+.geo-status {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-subtle);
+}
+
+/* --------------------------------------------------------------------------
+   11. Network Explorer Table
+   -------------------------------------------------------------------------- */
+.table-responsive {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.data-table th, .data-table td {
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.data-table th {
+  background: var(--bg-card-subtle);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.data-table td {
+  font-size: 0.85rem;
+}
+
+.data-table tbody tr:hover {
+  background: var(--bg-card-hover);
+}
+
+.airport-code-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  background: rgba(2, 132, 199, 0.15);
+  color: var(--accent-sky);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.dest-tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  padding: 0.1rem 0.35rem;
+  border-radius: var(--radius-sm);
+  margin: 0.15rem 0.15rem 0.15rem 0;
+  color: var(--text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   12. Alternative Route Comparison Matrix
+   -------------------------------------------------------------------------- */
+.comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.comparison-card {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.comparison-card.recommended {
+  border-color: var(--accent-sky);
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.15);
+}
+
+.comparison-card.recommended::before {
+  content: 'OPTIMAL PATH';
+  position: absolute;
+  top: -10px;
+  right: 14px;
+  background: var(--accent-sky);
+  color: #080d1a;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  letter-spacing: 0.05em;
+}
+
+.comparison-rank {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent-sky);
+  margin-bottom: 0.5rem;
+}
+
+.comparison-path-sequence {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.comparison-metrics-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex: 1;
+}
+
+.comparison-metric-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
+  padding-bottom: 0.35rem;
+}
+
+.comparison-metric-row span {
+  color: var(--text-muted);
+}
+
+.comparison-metric-row strong {
+  font-family: 'JetBrains Mono', monospace;
+  color: #fff;
+}
+
+/* --------------------------------------------------------------------------
+   13. Algorithm Visualizer & Stepper
+   -------------------------------------------------------------------------- */
+.algorithms-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.stepper-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stepper-progress-bar-wrapper {
+  height: 6px;
+  background: var(--bg-input);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 0.85rem;
+}
+
+.stepper-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-emerald));
+  transition: width 0.25s ease;
+}
+
+.stepper-status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tracer-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.tracer-table-wrapper h4, .tracer-log-wrapper h4 {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.65rem;
+}
+
+.data-table-sm th, .data-table-sm td {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.78rem;
+}
+
+.terminal-log {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  height: 300px;
+  overflow-y: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.log-entry {
+  padding: 0.15rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.log-info { color: var(--accent-sky); }
+.log-relax { color: var(--accent-emerald); }
+.log-skip { color: var(--text-subtle); }
+.log-target { color: var(--accent-crimson); font-weight: 700; }
+
+.algo-tab-buttons {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.algo-tab-btn {
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  transition: all var(--transition-fast);
+}
+
+.algo-tab-btn.active {
+  background: var(--accent-primary);
+  color: #fff;
+  border-color: var(--accent-primary);
+}
+
+.pseudocode-block {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: #cbd5e1;
+  overflow-x: auto;
+  margin-top: 0.75rem;
+}
+
+.keyword { color: #f43f5e; font-weight: 700; }
+.fn { color: #38bdf8; }
+.comment { color: #64748b; font-style: italic; }
+
+/* --------------------------------------------------------------------------
+   14. About & Specs
+   -------------------------------------------------------------------------- */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 2rem;
+}
+
+.feature-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-top: 0.75rem;
+}
+
+.feature-list li {
+  position: relative;
+  padding-left: 1.5rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.feature-list li strong {
+  color: var(--text-heading);
+}
+
+.feature-list li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--accent-emerald);
+  font-weight: 800;
+}
+
+.spec-box {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+}
+
+.spec-box h4 {
+  font-size: 0.95rem;
+  margin-bottom: 0.85rem;
+  color: #fff;
+}
+
+.spec-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.spec-table td {
+  padding: 0.5rem 0;
+  font-size: 0.82rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.spec-table td:first-child {
+  color: var(--text-muted);
+  width: 40%;
+}
+
+.spec-table td:last-child {
+  color: #fff;
+  font-weight: 500;
+}
+
+.alert-box {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  font-size: 0.78rem;
+  color: var(--accent-amber);
+  line-height: 1.4;
+}
+
+/* --------------------------------------------------------------------------
+   15. Modal Dialog & Footer
+   -------------------------------------------------------------------------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-modal-backdrop);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-backdrop.active {
+  display: flex;
+}
+
+.modal-dialog {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 480px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: modal-enter 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modal-enter {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+  padding: 1.15rem 1.4rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.modal-close {
+  font-size: 1.4rem;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: #fff;
+}
+
+.modal-body {
+  padding: 1.4rem;
+}
+
+.modal-footer {
+  padding: 1rem 1.4rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  background: var(--bg-card-subtle);
+}
+
+.app-footer {
+  padding: 1.25rem 1.75rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-card);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   16. Responsive Media Queries
+   -------------------------------------------------------------------------- */
+@media (max-width: 1200px) {
+  .planner-layout {
+    grid-template-columns: 1fr;
+  }
+  .map-card {
+    height: 580px;
+  }
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .algorithms-layout {
+    grid-template-columns: 1fr;
+  }
+  .comparison-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+  .sidebar-toggle {
+    display: block;
+  }
+  .menu-btn {
+    display: block;
+  }
+  .main-wrapper {
+    margin-left: 0;
+    width: 100vw;
+  }
+  .tracer-split {
+    grid-template-columns: 1fr;
+  }
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+  .top-header {
+    padding: 0 1rem;
+  }
+  .main-content {
+    padding: 1rem;
+  }
+  .search-box {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+  .result-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-row.airports-select-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .swap-airports-btn {
+    align-self: center;
+    transform: rotate(90deg);
+    margin: 0.25rem 0;
+  }
+  .app-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+}

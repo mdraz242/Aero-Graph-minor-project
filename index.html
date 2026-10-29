@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AeroGraph — Interactive Flight Route Planner & Graph Algorithm Visualizer</title>
+  <meta name="description"
+    content="A professional aviation operations dashboard and flight route planner using Graph Theory, Dijkstra's Algorithm, Prim's MST, and K-Shortest Paths.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h2>Arbaj Aero Graph</h2>
+          <span class="badge-sub">DAA Minor Project</span>
+        </div>
+        <button class="sidebar-toggle" id="mobileSidebarClose" aria-label="Close sidebar">✕</button>
+      </div>
+
+      <nav class="nav-menu">
+        <div class="nav-section-label">OPERATIONS</div>
+        <button class="nav-item active" data-tab="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+          </svg>
+          <span>Dashboard & Planner</span>
+        </button>
+
+        <button class="nav-item" data-tab="network">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="18" cy="5" r="3" />
+            <circle cx="6" cy="12" r="3" />
+            <circle cx="18" cy="19" r="3" />
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+          </svg>
+          <span>Airport Network</span>
+        </button>
+
+        <button class="nav-item" data-tab="comparison">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10" />
+            <line x1="12" y1="20" x2="12" y2="4" />
+            <line x1="6" y1="20" x2="6" y2="14" />
+          </svg>
+          <span>Route Comparison (K-Paths)</span>
+        </button>
+
+        <button class="nav-item" data-tab="algorithms">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon
+              points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
+          <span>Algorithm Visualizer</span>
+        </button>
+
+        <div class="nav-section-label">PROJECT</div>
+        <button class="nav-item" data-tab="about">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="16" x2="12" y2="12" />
+            <line x1="12" y1="8" x2="12.01" y2="8" />
+          </svg>
+          <span>About & DAA Theory</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar Status & Quick Guide -->
+      <div class="sidebar-status-card">
+        <div class="status-indicator-row">
+          <span class="live-dot"></span>
+          <span class="status-label">Graph Engine Active</span>
+        </div>
+        <p class="status-info">14 Airports &bull; 34 Direct Air Corridors &bull; Indian Airspace</p>
+        <div class="network-quick-metric">
+          <div><small>Graph Type</small><strong>Weighted Adjacency</strong></div>
+          <div><small>Efficiency</small><strong class="text-accent">O((V+E)logV)</strong></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+      <!-- HEADER -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="menu-btn" id="mobileMenuBtn" aria-label="Toggle Navigation">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+          <div>
+            <h1 class="header-title" id="pageHeaderTitle">Flight Route Operations Dashboard</h1>
+            <p class="header-subtitle">Graph Theory Routing Engine for Indian Air Traffic Corridors</p>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <!-- Search input -->
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input type="text" id="globalAirportSearch" placeholder="Search airport or city (e.g. DEL, Mumbai)..."
+              autocomplete="off">
+            <div class="search-results-dropdown" id="searchResultsDropdown"></div>
+          </div>
+
+          <!-- Network status badge -->
+          <div class="network-badge" id="networkStatusBadge">
+            <span class="badge-dot pulse"></span>
+            <span id="networkStatusText">Airspace Online</span>
+          </div>
+
+          <!-- Theme toggle -->
+          <button class="icon-button" id="themeToggleBtn" title="Toggle Light/Dark Theme" aria-label="Toggle Theme">
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="1" x2="12" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" />
+              <line x1="21" y1="12" x2="23" y2="12" />
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            </svg>
+            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+          </button>
+
+          <!-- Reset button -->
+          <button class="button button-outline button-sm" id="resetAppBtn" title="Reset Planner & View">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+              <path d="M3 3v5h5" />
+            </svg>
+            <span>Reset</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- MAIN CONTENT CONTAINER -->
+      <main class="main-content">
+        <!-- SUMMARY STATS CARDS -->
+        <section class="summary-grid">
+          <div class="stat-card">
+            <div class="stat-icon icon-blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path
+                  d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                <line x1="12" y1="22.08" x2="12" y2="12" />
+              </svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Total Airports (Vertices)</span>
+              <h3 class="stat-value" id="statTotalAirports">--</h3>
+              <span class="stat-sub">Across 14 Indian Metros</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon icon-cyan">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+              </svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Flight Corridors (Edges)</span>
+              <h3 class="stat-value" id="statTotalEdges">--</h3>
+              <span class="stat-sub">Direct Air Routes (Bidirectional)</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon icon-emerald">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                <polyline points="17 6 23 6 23 12" />
+              </svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Routes Calculated</span>
+              <h3 class="stat-value" id="statRoutesCalculated">0</h3>
+              <span class="stat-sub">Optimization Invocations</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon icon-purple">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 14 14" />
+              </svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Average Route Distance</span>
+              <h3 class="stat-value" id="statAvgDistance">--</h3>
+              <span class="stat-sub">Direct Segment Average</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 1: DASHBOARD & ROUTE PLANNER (Primary View) -->
+        <div class="tab-pane active" id="pane-dashboard">
+          <div class="planner-layout">
+            <!-- LEFT PANEL: Flight Control & Results -->
+            <div class="flight-control-panel">
+              <!-- Planning Card -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path
+                        d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.3c.4-.2.6-.6.5-1.1z" />
+                    </svg>
+                    <span>Route Configuration</span>
+                  </div>
+                  <span class="badge badge-accent">Live Graph Engine</span>
+                </div>
+
+                <form id="routePlannerForm" class="route-form">
+                  <!-- Airport Selection -->
+                  <div class="form-row airports-select-row">
+                    <div class="form-group flex-1">
+                      <label for="sourceAirportSelect">
+                        <span class="dot-indicator dot-green"></span>
+                        Origin Airport
+                      </label>
+                      <select id="sourceAirportSelect" class="form-control" required>
+                        <option value="" disabled selected>Select origin...</option>
+                      </select>
+                    </div>
+
+                    <button type="button" class="swap-airports-btn" id="swapAirportsBtn"
+                      title="Swap Origin and Destination" aria-label="Swap origin and destination">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M7 16V4M7 4L3 8M7 4L11 8M17 8v12m0 0l4-4m-4 4l-4-4" />
+                      </svg>
+                    </button>
+
+                    <div class="form-group flex-1">
+                      <label for="destAirportSelect">
+                        <span class="dot-indicator dot-red"></span>
+                        Destination Airport
+                      </label>
+                      <select id="destAirportSelect" class="form-control" required>
+                        <option value="" disabled selected>Select destination...</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Algorithm & Optimization Criterion -->
+                  <div class="form-row">
+                    <div class="form-group flex-1">
+                      <label for="algorithmSelect">Algorithm Selection</label>
+                      <select id="algorithmSelect" class="form-control">
+                        <option value="dijkstra-distance">Dijkstra: Shortest Distance (km)</option>
+                        <option value="dijkstra-fare">Dijkstra: Lowest Fare (₹ INR)</option>
+                        <option value="dijkstra-time">Dijkstra: Fastest Duration (hrs)</option>
+                        <option value="k-shortest">Yen's K-Shortest Paths (Top 3)</option>
+                        <option value="prim-mst">Prim's Minimum Spanning Tree (MST)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Quick preset buttons -->
+                  <div class="quick-presets">
+                    <span class="presets-label">Popular Routes:</span>
+                    <button type="button" class="preset-chip" data-src="DEL" data-dst="BLR">DEL &rarr; BLR</button>
+                    <button type="button" class="preset-chip" data-src="BOM" data-dst="CCU">BOM &rarr; CCU</button>
+                    <button type="button" class="preset-chip" data-src="IXC" data-dst="COK">IXC &rarr; COK</button>
+                    <button type="button" class="preset-chip" data-src="JAI" data-dst="MAA">JAI &rarr; MAA</button>
+                  </div>
+
+                  <!-- Action Buttons -->
+                  <div class="form-actions">
+                    <button type="submit" class="button button-primary button-lg" id="findRouteBtn">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                      </svg>
+                      <span>Calculate Optimal Route</span>
+                    </button>
+
+                    <button type="button" class="button button-secondary" id="clearRouteBtn">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                      <span>Clear</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- ROUTE RESULTS DISPLAY PANEL -->
+              <div class="card route-results-card" id="routeResultsCard">
+                <div class="card-header">
+                  <div class="card-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                      <polyline points="2 17 12 22 22 17" />
+                      <polyline points="2 12 12 17 22 12" />
+                    </svg>
+                    <span>Route Computation Dossier</span>
+                  </div>
+                  <span class="badge" id="routeStatusBadge">Ready</span>
+                </div>
+
+                <div class="card-body" id="routeResultsContent">
+                  <!-- Default state -->
+                  <div class="empty-state">
+                    <div class="empty-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="2" y1="12" x2="22" y2="12" />
+                        <path
+                          d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                      </svg>
+                    </div>
+                    <h4>No Route Computed Yet</h4>
+                    <p>Select origin and destination airports and click <strong>Calculate Optimal Route</strong> to run
+                      graph relaxation algorithms.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT PANEL: INTERACTIVE AIRPORT NETWORK VISUALIZATION -->
+            <div class="map-visualization-panel">
+              <div class="card map-card">
+                <div class="map-card-header">
+                  <div class="map-title-group">
+                    <h3>Indian Airspace Network Graph</h3>
+                    <span class="map-sub">Interactive Geodetic Projection (Lat/Lng mapped to SVG Canvas)</span>
+                  </div>
+
+                  <div class="map-controls">
+                    <div class="view-switch-group">
+                      <button class="view-btn active" id="viewModeAll" title="Show all flight corridors">All
+                        Corridors</button>
+                      <button class="view-btn" id="viewModeActive" title="Highlight active route only">Active
+                        Route</button>
+                      <button class="view-btn" id="viewModeMst" title="Show Minimum Spanning Tree">Prim's MST</button>
+                    </div>
+                    <div class="zoom-controls">
+                      <button class="zoom-btn" id="zoomInBtn" title="Zoom In">+</button>
+                      <button class="zoom-btn" id="zoomOutBtn" title="Zoom Out">&minus;</button>
+                      <button class="zoom-btn" id="zoomResetBtn" title="Reset Map View">&#8635;</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- SVG Container -->
+                <div class="svg-map-wrapper" id="svgMapWrapper">
+                  <svg id="networkSvg" viewBox="0 0 900 860" preserveAspectRatio="xMidYMid meet">
+                    <!-- Defs for glow, markers, gradients -->
+                    <defs>
+                      <!-- Route gradients -->
+                      <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#3b82f6" />
+                        <stop offset="50%" stop-color="#06b6d4" />
+                        <stop offset="100%" stop-color="#10b981" />
+                      </linearGradient>
+
+                      <linearGradient id="mstGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#10b981" />
+                        <stop offset="100%" stop-color="#34d399" />
+                      </linearGradient>
+
+                      <!-- Glow filters -->
+                      <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="3.5" result="blur" />
+                        <feMerge>
+                          <feMergeNode in="blur" />
+                          <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                      </filter>
+
+                      <filter id="glowStrong" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="6" result="blur1" />
+                        <feGaussianBlur stdDeviation="12" result="blur2" />
+                        <feMerge>
+                          <feMergeNode in="blur2" />
+                          <feMergeNode in="blur1" />
+                          <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                      </filter>
+
+                      <!-- Plane icon marker -->
+                      <g id="planeMarker">
+                        <path
+                          d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"
+                          fill="#38bdf8" />
+                      </g>
+                    </defs>
+
+                    <!-- Background Airspace Grid & India Schematic Boundary -->
+                    <g id="gridGroup" class="svg-grid-layer"></g>
+                    <g id="indiaMapGroup" class="svg-map-layer"></g>
+
+                    <!-- Edges / Flight Paths -->
+                    <g id="flightEdgesGroup" class="svg-edges-layer"></g>
+                    <g id="mstEdgesGroup" class="svg-mst-layer"></g>
+                    <g id="activeRouteEdgesGroup" class="svg-active-route-layer"></g>
+
+                    <!-- Animated Flight Marker -->
+                    <g id="animatedFlightsGroup" class="svg-flight-animation-layer"></g>
+
+                    <!-- Nodes / Airports -->
+                    <g id="airportNodesGroup" class="svg-nodes-layer"></g>
+                  </svg>
+
+                  <!-- Floating Map Legend -->
+                  <div class="map-legend">
+                    <div class="legend-header">Map Legend</div>
+                    <div class="legend-item"><span class="legend-dot origin-dot"></span> Origin (Source)</div>
+                    <div class="legend-item"><span class="legend-dot dest-dot"></span> Destination</div>
+                    <div class="legend-item"><span class="legend-dot transit-dot"></span> Transit Hub</div>
+                    <div class="legend-item"><span class="legend-line route-line"></span> Calculated Route</div>
+                    <div class="legend-item"><span class="legend-line corridor-line"></span> Air Corridor</div>
+                    <div class="legend-item"><span class="legend-line mst-line"></span> Prim's MST Link</div>
+                  </div>
+
+                  <!-- Hover Tooltip -->
+                  <div class="airport-tooltip" id="airportTooltip"></div>
+                </div>
+
+                <!-- Map Info Footer -->
+                <div class="map-footer-bar">
+                  <div class="map-hint">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="16" x2="12" y2="12" />
+                      <line x1="12" y1="8" x2="12.01" y2="8" />
+                    </svg>
+                    <span>Click any airport to view direct flights or set as Origin / Destination. Scroll to zoom, drag
+                      to pan.</span>
+                  </div>
+                  <div class="geo-status">
+                    Schematic Equirectangular Projection &bull; WGS84 Coords
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: AIRPORT NETWORK EXPLORER -->
+        <div class="tab-pane" id="pane-network">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="18" cy="5" r="3" />
+                  <circle cx="6" cy="12" r="3" />
+                  <circle cx="18" cy="19" r="3" />
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                </svg>
+                <span>Airport Network Topology & Adjacency Registry</span>
+              </div>
+              <div class="card-actions">
+                <input type="text" class="form-control form-control-sm" id="networkFilterInput"
+                  placeholder="Filter airports...">
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table" id="airportsDataTable">
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Airport Name</th>
+                    <th>City & Region</th>
+                    <th>Coordinates</th>
+                    <th>Degree (Direct Links)</th>
+                    <th>Connected Destinations</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="airportsTableBody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: ROUTE COMPARISON (Yen's K-Shortest Paths) -->
+        <div class="tab-pane" id="pane-comparison">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="20" x2="18" y2="10" />
+                  <line x1="12" y1="20" x2="12" y2="4" />
+                  <line x1="6" y1="20" x2="6" y2="14" />
+                </svg>
+                <span>Alternative Route Comparison Matrix (Top 3 Paths)</span>
+              </div>
+              <span class="badge badge-accent">Yen's Loopless K-Shortest Algorithm</span>
+            </div>
+
+            <div class="card-body">
+              <p class="section-desc">
+                When airline flight dispatchers plan commercial flights, finding a single shortest path is often
+                insufficient due to slot availability, airspace congestion, or weather deviations. Below is the
+                multi-criteria evaluation of the top loopless alternative routes.
+              </p>
+
+              <div id="comparisonContainer">
+                <div class="empty-state">
+                  <h4>No Active Route Pair Selected</h4>
+                  <p>Choose an origin and destination in the Route Planner tab to view the comparison table and
+                    trade-off metrics.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: ALGORITHM VISUALIZATION & STEP-BY-STEP TRACER -->
+        <div class="tab-pane" id="pane-algorithms">
+          <div class="algorithms-layout">
+            <!-- Left: Stepper Controls & Trace Table -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 3 19 12 5 21 5 3" />
+                  </svg>
+                  <span>Step-by-Step Algorithm Execution Tracer</span>
+                </div>
+                <div class="stepper-controls">
+                  <button class="button button-sm button-secondary" id="stepPrevBtn" title="Previous step">
+                    &larr; Prev
+                  </button>
+                  <button class="button button-sm button-primary" id="stepPlayPauseBtn" title="Play or pause animation">
+                    &#9654; Play
+                  </button>
+                  <button class="button button-sm button-secondary" id="stepNextBtn" title="Next step">
+                    Next &rarr;
+                  </button>
+                  <button class="button button-sm button-outline" id="stepResetBtn" title="Reset tracer">
+                    Reset
+                  </button>
+                </div>
+              </div>
+
+              <div class="card-body">
+                <div class="stepper-progress-bar-wrapper">
+                  <div class="stepper-progress-bar" id="stepperProgressBar" style="width: 0%;"></div>
+                </div>
+                <div class="stepper-status-row">
+                  <span id="stepCounterLabel">Step 0 / 0</span>
+                  <span id="stepCurrentAction" class="font-mono text-accent">Ready to trace</span>
+                </div>
+
+                <div class="tracer-split">
+                  <!-- Live Priority Queue / State Table -->
+                  <div class="tracer-table-wrapper">
+                    <h4>Current Vertex Relaxation Table</h4>
+                    <table class="data-table data-table-sm" id="tracerTable">
+                      <thead>
+                        <tr>
+                          <th>Vertex</th>
+                          <th>Status</th>
+                          <th>Tentative Dist (km)</th>
+                          <th>Predecessor</th>
+                        </tr>
+                      </thead>
+                      <tbody id="tracerTableBody">
+                        <!-- Populated during step trace -->
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <!-- Execution Log -->
+                  <div class="tracer-log-wrapper">
+                    <h4>Execution Log & Mathematical Proof</h4>
+                    <div class="terminal-log" id="tracerTerminalLog">
+                      <div class="log-entry log-info">[Engine initialized] Select a route to generate graph execution
+                        trace.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Algorithm Documentation & Pseudocode -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="16" y1="13" x2="8" y2="13" />
+                    <line x1="16" y1="17" x2="8" y2="17" />
+                    <polyline points="10 9 9 9 8 9" />
+                  </svg>
+                  <span>Algorithm Theoretical Mechanics</span>
+                </div>
+                <div class="algo-tab-buttons">
+                  <button class="algo-tab-btn active" data-algo="dijkstra">Dijkstra's</button>
+                  <button class="algo-tab-btn" data-algo="prim">Prim's MST</button>
+                  <button class="algo-tab-btn" data-algo="yen">Yen's K-Paths</button>
+                </div>
+              </div>
+
+              <div class="card-body">
+                <div id="algoDocContent">
+                  <!-- Injected via script -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: ABOUT & DAA THEORY -->
+        <div class="tab-pane" id="pane-about">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="16" x2="12" y2="12" />
+                  <line x1="12" y1="8" x2="12.01" y2="8" />
+                </svg>
+                <span>About AeroGraph — Academic Project Overview</span>
+              </div>
+              <span class="badge badge-accent">CS401 DAA Project</span>
+            </div>
+
+            <div class="card-body about-content">
+              <div class="about-grid">
+                <div>
+                  <h3>Project Overview</h3>
+                  <p>
+                    <strong>AeroGraph</strong> is an advanced aviation route planning and graph optimization simulation
+                    created for the <em>Design and Analysis of Algorithms (DAA)</em> curriculum. It models Indian civil
+                    aviation corridors as a weighted, connected graph where airports are vertices and direct air
+                    connections are edges.
+                  </p>
+                  <p>
+                    By implementing foundational algorithms (Dijkstra, Prim's, and Yen's K-Shortest) directly in pure
+                    JavaScript without external dependencies, it provides real-time visualization of algorithmic
+                    complexity, relaxation steps, and multi-objective route trade-offs.
+                  </p>
+
+                  <h3 class="mt-4">Algorithms Implemented</h3>
+                  <ul class="feature-list">
+                    <li>
+                      <strong>Dijkstra's Single-Source Shortest Path:</strong> Finds optimal point-to-point flights
+                      using a custom Min-Priority Queue. Supports multi-objective optimization across Distance (km),
+                      Fare (₹ INR), and Flight Duration (hours).
+                    </li>
+                    <li>
+                      <strong>Prim's Minimum Spanning Tree (MST):</strong> Determines the minimal total network
+                      connectivity required to interconnect all reachable Indian airports without redundant cycles.
+                    </li>
+                    <li>
+                      <strong>Yen's K-Shortest Loopless Paths:</strong> Generates deviations at intermediate spur nodes
+                      to provide dispatchers with the top 3 alternative paths for weather or airspace bypass.
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <div class="spec-box">
+                    <h4>Technical Specifications</h4>
+                    <table class="spec-table">
+                      <tr>
+                        <td>Architecture</td>
+                        <td>Pure HTML5, CSS3, Vanilla ES6+ JavaScript</td>
+                      </tr>
+                      <tr>
+                        <td>Data Structure</td>
+                        <td>Adjacency List with Min-Priority Heap</td>
+                      </tr>
+                      <tr>
+                        <td>Map Engine</td>
+                        <td>Native Procedural SVG with Geodetic Mercator / Equirectangular Projection</td>
+                      </tr>
+                      <tr>
+                        <td>Frameworks Used</td>
+                        <td>None (Zero external runtime dependencies)</td>
+                      </tr>
+                      <tr>
+                        <td>Coordinate System</td>
+                        <td>WGS84 Lat/Lng mapped to 900x860 viewBox</td>
+                      </tr>
+                      <tr>
+                        <td>Airport Dataset</td>
+                        <td>14 Major Indian Air Hubs (DEL, BOM, BLR, MAA, HYD, CCU, PNQ, AMD, COK, JAI, LKO, IXC, GOI,
+                          GAU)</td>
+                      </tr>
+                    </table>
+                  </div>
+
+                  <div class="alert-box mt-4">
+                    <strong>Academic Disclaimer:</strong> All flight numbers, schedules, fares, and travel durations
+                    displayed within this application are realistic simulated values intended purely for educational and
+                    algorithmic demonstration. They do not constitute live commercial airline inventory.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- FOOTER -->
+      <footer class="app-footer">
+        <div class="footer-left">
+          <strong>AeroGraph Flight Route Planner</strong> &bull; DAA Academic Graph Theory Project
+        </div>
+        <div class="footer-center">
+          Pure HTML5 &bull; CSS3 Vanilla &bull; ES6+ JavaScript &bull; SVG Interactive Network
+        </div>
+        <div class="footer-right">
+          Simulated Airspace Data &bull; All calculations client-side
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- AIRPORT DETAIL MODAL -->
+  <div class="modal-backdrop" id="airportModalBackdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title" id="modalAirportTitle">Airport Details</div>
+        <button class="modal-close" id="modalCloseBtn">&times;</button>
+      </div>
+      <div class="modal-body" id="modalAirportBody">
+        <!-- Content injected dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button class="button button-secondary" id="modalSetOriginBtn">Set as Origin</button>
+        <button class="button button-primary" id="modalSetDestBtn">Set as Destination</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
